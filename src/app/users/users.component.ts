@@ -1,8 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { UserService } from '../core/services/user.service';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { IUser } from '../core/interfaces/user.interface';
-import { FormControl, FormGroup } from '@angular/forms';
-import { debounceTime, takeWhile } from 'rxjs/operators';
+import { UserService } from '../core/services/user.service';
 
 @Component({
   selector: 'app-users',
@@ -11,15 +9,18 @@ import { debounceTime, takeWhile } from 'rxjs/operators';
 })
 export class UsersComponent implements OnInit {
   users: IUser[];
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService,
+    private cdRef: ChangeDetectorRef) { }
 
   ngOnInit() {
+    this.cdRef.detach();
     this.searchUsers();
   }
 
   searchUsers(searchQuery = '') {
     this.userService.searchUsers(searchQuery).subscribe((users) => {
       this.users = users;
+      this.cdRef.detectChanges();
     });
   }
 
@@ -27,5 +28,5 @@ export class UsersComponent implements OnInit {
     return user.email;
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() { }
 }
